@@ -1,0 +1,78 @@
+---
+title: "Optimization in R"
+output: html_document
+---
+Resource: http://www.is.uni-freiburg.de/resources/computational-economics/5_OptimizationR.pdf
+
+```{r One Dimensional Optimization}
+
+# SYNTAX: optimizer(objective, constraints, bounds=NULL, types=NULL, maximum=FALSE)
+
+# One Dimensional Function (Objective Function)
+f = function(x) 2*(x[1]-1)^2 + 5*(x[2]-3)^2 + 10
+
+# Constraints
+cons = c(1,1)
+
+# Optimization
+r = optim(cons, f)
+r
+
+# Check if optimization converged to 0
+r$convergence == 0
+
+# Input arguments for the optimization function
+r$par
+
+# Value of the objective function
+r$value
+
+```
+
+
+# Linear Programming Optimization
+Objective function
+  - goal is to maximize profits
+  - products A and B are sold at 25 and 20
+  $\text { Sales_ }_{\max }=\max _{x_{1}, x_{2}} 25 x_{1}+20 x_{2}=\max _{x_{1}, x_{2}}\left[\begin{array}{c}{25} \\ {20}\end{array}\right]^{T}\left[\begin{array}{c}{x_{1}} \\ {x_{2}}\end{array}\right]$
+Constraints
+  Resource:
+  - product A requires 20 units, B requires 12
+  - only 1800 untis
+  Time:
+  - both products require 1/15 hours
+  - a working day has 8 hours
+  $\begin{array}{l}{20 x_{1}+12 x_{2} \leq 1800} \\ {\frac{1}{15} x_{1}+\frac{1}{15} x_{2} \leq 8}\end{array}$
+
+```{r Linear Programming Optimization}
+require(lpSolve)
+
+# SYNTAX: lp(direction="min", objective.in, const.mat, const.dir, const.rhs)
+
+# Solving for where the two lines meet will minimize the objective
+objective.in = c(25, 20)
+const.mat = matrix(c(20, 12, 1/15, 1/15), nrow=2, byrow=T)
+const.rhs = c(1800, 8)
+const.dir = c("<=", "<=")
+optimum = lp(direction="max", objective.in, const.mat, const.dir, const.rhs)
+optimum
+
+# Optimal values of x1 and x2
+optimum$solution
+
+# Objective at minimum 
+optimum$objval
+
+```
+
+
+
+```{r Non-differentiable function with optimx}
+f = function(x) return(abs(x-2) + 2*abs(x-1))
+xmin = optimize(f, interval = c(0, 3), tol = 0.0001) 
+xmin
+
+plot(f, 0, 3)
+```
+
+
